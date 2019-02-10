@@ -1,0 +1,49 @@
+format_version: "6"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: other
+app:
+  envs:
+  - CONFIG_docker_build_tag: b${BITRISE_BUILD_NUMBER}
+  - GCP_PROJECT_ID: $GCP_PROJECT_ID
+  - IMAGE_NAME: echo-server
+    opts:
+      is_expand: false
+workflows:
+  _check_required_configs:
+    steps:
+    - script@1.1.5:
+        title: Check required configs
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+
+            if [ -z "$CONFIG_docker_build_tag" ]; then echo "[!] CONFIG_docker_build_tag isn't set - required!"; exit 1; fi
+            if [ -z "$GCP_PROJECT_ID" ]; then echo "[!] GCP_PROJECT_ID isn't set - required!"; exit 1; fi
+            if [ -z "$IMAGE_NAME" ]; then echo "[!] IMAGE_NAME isn't set - required!"; exit 1; fi
+
+            echo 'Required configs available'
+  build:
+    before_run:
+    - _check_required_configs
+    steps:
+    - script@1.1.5:
+        title: docker build
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+
+            docker build -t gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag} .
+  build-and-push:
+    before_run:
+    - build
+    steps:
+    - script@1.1.5:
+        title: docker push
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+
+            docker push gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag}

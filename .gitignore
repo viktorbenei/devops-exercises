@@ -1,3 +1,5 @@
+# bitrise cli
+.bitrise.secrets.yml
 # Terraform
 secrets.tfvars
 terraform.tfstate
@@ -5,3 +7,5 @@ terraform.tfstate.backup
 .terraform
 .terraform.tfstate.lock.*
 #
+_bin/
+.env

@@ -1,0 +1,56 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "echo-server-config"
+  namespace: "default"
+  labels:
+    app: "echo-server"
+data:
+  PORT: "8182"
+---
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "echo-server"
+  namespace: "default"
+  labels:
+    app: "echo-server"
+spec:
+  selector:
+    matchLabels:
+      app: "echo-server"
+  template:
+    metadata:
+      labels:
+        app: "echo-server"
+    spec:
+      containers:
+      - name: "echo-server"
+        image: "gcr.io/{{getenvRequired "GCP_PROJECT_ID"}}/{{getenvRequired "IMAGE_NAME"}}:{{getenvRequired "CONFIG_docker_build_tag"}}"
+        env:
+        - name: "PORT"
+          valueFrom:
+            configMapKeyRef:
+              key: "PORT"
+              name: "echo-server-config"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "echo-server-hpa"
+  namespace: "default"
+  labels:
+    app: "echo-server"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "echo-server"
+    apiVersion: "apps/v1beta1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80

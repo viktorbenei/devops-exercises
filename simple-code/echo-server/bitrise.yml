@@ -23,6 +23,32 @@ workflows:
             if [ -z "$IMAGE_NAME" ]; then echo "[!] IMAGE_NAME isn't set - required!"; exit 1; fi
 
             echo 'Required configs available'
+    - git::https://github.com/bitrise-community/bitrise-step-generate-text-file.git@go-rewrite-1:
+        inputs:
+        - file_content: |
+            package main
+
+            const version = "${CONFIG_docker_build_tag}"
+        - file_name: ./version.go
+  BuildPushAndDeploy:
+    before_run:
+    - build-and-push
+    steps:
+    - script@1.1.5:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+
+            # Modifying the image directly:
+            # kubectl set image deployment/echo-server echo-server=gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag}
+
+            # Or using YAML files and kubectl apply:
+            go get github.com/bitrise-tools/gotgen
+            cd ./kubernetes
+            gotgen generate
+            kubectl apply -f ./deployment.yaml
+            kubectl apply -f ./service.yaml
   build:
     before_run:
     - _check_required_configs

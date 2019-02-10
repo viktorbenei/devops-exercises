@@ -1,0 +1,11 @@
+{
+  "inventory": {
+    "KeyBool": true,
+    "KeyOne": "value for key one",
+    "KeyTwo": 2
+  },
+  "delimiter": {
+    "left": "{{",
+    "right": "}}"
+  }
+}

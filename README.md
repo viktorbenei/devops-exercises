@@ -11,3 +11,4 @@ That said I try to update these when I can, but **I don't aim for keeping these 
 ## The list
 
 - `kubernetes-setup/gke/terraform`: Create a GKE Kubernetes Cluster with Terraform.
+- `kubernetes-setup/gke/gcloud`: Create a GKE Kubernetes Cluster with `gcloud` (Google Cloud CLI).

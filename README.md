@@ -13,3 +13,5 @@ That said I try to update these when I can, but **I don't aim for keeping these 
 - `kubernetes-setup/gke/terraform`: Create a GKE Kubernetes Cluster with Terraform.
 - `kubernetes-setup/gke/gcloud`: Create a GKE Kubernetes Cluster with `gcloud` (Google Cloud CLI).
 - `simple-code/echo-server`: Minimal server example, used for testing infra/kubernetes features.
+    - The server port can be changed via `PORT` env var.
+    - Kubernetes Deploy included.

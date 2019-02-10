@@ -13,6 +13,7 @@ func sayHello(w http.ResponseWriter, r *http.Request) {
 	message := r.URL.Path
 	message = strings.TrimPrefix(message, "/")
 	message = "Hello " + message
+	message += "\n\nVersion: " + version
 	w.Write([]byte(message))
 }
 

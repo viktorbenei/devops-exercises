@@ -1,3 +1,3 @@
 package main
 
-const version = "b0.7"
+const version = "b0.8"

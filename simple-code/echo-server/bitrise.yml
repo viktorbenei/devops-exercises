@@ -8,6 +8,7 @@ app:
   - IMAGE_NAME: echo-server
     opts:
       is_expand: false
+  - DOCKER_IMAGE_WITH_VERSION: "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag}"
 workflows:
   _check_required_configs:
     steps:
@@ -41,7 +42,7 @@ workflows:
             set -ex
 
             # Modifying the image directly:
-            # kubectl set image deployment/echo-server echo-server=gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag}
+            # kubectl set image deployment/echo-server echo-server=${DOCKER_IMAGE_WITH_VERSION}
 
             # Or using YAML files and kubectl apply:
             go get github.com/bitrise-tools/gotgen
@@ -60,7 +61,7 @@ workflows:
             #!/usr/bin/env bash
             set -ex
 
-            docker build -t gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag} .
+            docker build -t ${DOCKER_IMAGE_WITH_VERSION} .
   build-and-push:
     before_run:
     - build
@@ -72,4 +73,4 @@ workflows:
             #!/usr/bin/env bash
             set -ex
 
-            docker push gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CONFIG_docker_build_tag}
+            docker push ${DOCKER_IMAGE_WITH_VERSION}

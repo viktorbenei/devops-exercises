@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: "echo-server"
-        image: "gcr.io/{{getenvRequired "GCP_PROJECT_ID"}}/{{getenvRequired "IMAGE_NAME"}}:{{getenvRequired "CONFIG_docker_build_tag"}}"
+        image: "{{getenvRequired "DOCKER_IMAGE_WITH_VERSION"}}"
         env:
         - name: "PORT"
           valueFrom:

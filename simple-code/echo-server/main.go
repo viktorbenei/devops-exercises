@@ -4,21 +4,43 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
+
+	"github.com/bitrise-io/api-utils/httpresponse"
+	"github.com/pkg/errors"
 )
 
 var port = "8182"
 
-func sayHello(w http.ResponseWriter, r *http.Request) {
-	message := r.URL.Path
-	message = strings.TrimPrefix(message, "/")
-	message = "Hello " + message
-	message += "\n\nVersion: " + version
-	w.Write([]byte(message))
+func authViaKubernetesSecret(w http.ResponseWriter, r *http.Request) error {
+	authSecretToken := os.Getenv("AUTH_SECRET_TOKEN")
+	if r.Header.Get("Authorization") != "token "+authSecretToken {
+		return errors.WithStack(httpresponse.RespondWithUnauthorized(w))
+	}
+	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
+		"message": "authorized - OK",
+	}))
+}
+
+func sayHello(w http.ResponseWriter, r *http.Request) error {
+	message := "Hello " + r.URL.Query().Get("name")
+
+	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
+		"message": message,
+		"version": version,
+	}))
+}
+
+func handleRoot(w http.ResponseWriter, r *http.Request) error {
+	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
+		"message": "Welcome!",
+		"version": version,
+	}))
 }
 
 func main() {
-	http.HandleFunc("/", sayHello)
+	http.Handle("/auth-via-kubernetes-secret", httpresponse.InternalErrHandlerFuncAdapter(authViaKubernetesSecret))
+	http.Handle("/hi", httpresponse.InternalErrHandlerFuncAdapter(sayHello))
+	http.Handle("/", httpresponse.InternalErrHandlerFuncAdapter(handleRoot))
 
 	if p := os.Getenv("PORT"); p != "" {
 		port = p
@@ -26,6 +48,7 @@ func main() {
 
 	log.Printf("Starting (on port: %s) ...", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Printf("[!] Exception: %+v", err)
 		panic(err)
 	}
 }

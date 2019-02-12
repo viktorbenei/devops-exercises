@@ -1,6 +1,7 @@
 #
-# When changing sync with .dockerignore!
+# When changing sync with .gitignore!
 #
+
 
 # bitrise cli
 .bitrise.secrets.yml

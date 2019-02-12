@@ -15,3 +15,9 @@ That said I try to update these when I can, but **I don't aim for keeping these 
 - `simple-code/echo-server`: Minimal server example, used for testing infra/kubernetes features.
     - The server port can be changed via `PORT` env var.
     - Kubernetes Deploy included.
+    - Endpoints:
+        - `/` : Simple "Welcome" message, with version included.
+        - `/hi?name=Someone` : Returns a message that includes the specified `name`.
+        - `/auth-via-kubernetes-secret` : Auth test.
+            - Send the auth token in header `Authorization` with value `token TheToken`
+            - `TheToken` has to match with the Secret set in the `echo-server-auth-secret-token` k8s secret's `token` data, otherwise you'll get an "Unauthorized".

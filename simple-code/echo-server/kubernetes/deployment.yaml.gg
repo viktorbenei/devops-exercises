@@ -29,6 +29,11 @@ spec:
       - name: "echo-server"
         image: "{{getenvRequired "DOCKER_IMAGE_WITH_VERSION"}}"
         env:
+        - name: AUTH_SECRET_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: echo-server-auth-secret-token
+              key: token
         - name: "PORT"
           valueFrom:
             configMapKeyRef:

@@ -1,0 +1,4 @@
+github.com/bitrise-io/api-utils v0.0.0-20181218142419-007402a6180d h1:ROwFk/dB2NeB1WG1mUUkVNTDwT24oiVbuQ63bNHtJGs=
+github.com/bitrise-io/api-utils v0.0.0-20181218142419-007402a6180d/go.mod h1:FwXTOBcd4twhPfBS61C83oz3QkrUjIawlZc4T/EBqEc=
+github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
+github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

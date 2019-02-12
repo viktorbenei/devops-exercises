@@ -45,7 +45,9 @@ workflows:
             # kubectl set image deployment/echo-server echo-server=${DOCKER_IMAGE_WITH_VERSION}
 
             # Or using YAML files and kubectl apply:
-            go get github.com/bitrise-tools/gotgen
+            cd /tmp
+            go get -u github.com/bitrise-tools/gotgen
+            cd -
             cd ./kubernetes
             gotgen generate
             kubectl apply -f ./deployment.yaml

@@ -13,7 +13,6 @@ var port = "8182"
 
 func authViaKubernetesSecret(w http.ResponseWriter, r *http.Request) error {
 	authSecretToken := os.Getenv("AUTH_SECRET_TOKEN")
-	log.Printf("(debug) authSecretToken: %s", authSecretToken)
 	if r.Header.Get("Authorization") != "token "+authSecretToken {
 		return errors.WithStack(httpresponse.RespondWithUnauthorized(w))
 	}

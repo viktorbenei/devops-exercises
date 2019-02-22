@@ -1,0 +1,16 @@
+format_version: "3"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: other
+
+workflows:
+  BuildAndRun:
+    steps:
+    - script@1.1.5:
+        title: build and run
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+
+            go build -o _bin/server
+            ./_bin/server

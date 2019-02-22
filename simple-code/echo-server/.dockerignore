@@ -7,10 +7,9 @@
 .bitrise.secrets.yml
 # Terraform
 secrets.tfvars
-terraform.tfstate
-terraform.tfstate.backup
-.terraform
-.terraform.tfstate.lock.*
+*.tfstate
+*.tfstate.*
+**/.terraform/*
 # secret envs
 .env
 # build intermediate dirs

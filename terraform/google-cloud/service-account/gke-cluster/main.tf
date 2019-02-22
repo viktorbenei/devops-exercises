@@ -1,6 +1,3 @@
-variable "gcp_project_id" {}
-variable "google_service_account_json_for_iam_create" {}
-
 provider "google" {
   # provider plugin version
   version = "~> 1.20"

@@ -6,7 +6,6 @@
 # bitrise cli
 .bitrise.secrets.yml
 # Terraform
-secrets.tfvars
 *.tfstate
 *.tfstate.*
 **/.terraform/*

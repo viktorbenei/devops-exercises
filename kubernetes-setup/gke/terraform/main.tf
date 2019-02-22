@@ -2,19 +2,6 @@
 # Docs: https://www.terraform.io/docs/providers/google/r/container_cluster.html
 #
 
-# empty username & password disables "basic auth" (https://www.terraform.io/docs/providers/google/r/container_cluster.html)
-variable "gke_master_username" {}
-
-variable "gke_master_password" {}
-
-variable "google_service_account_json" {}
-
-# The ID of the project on Google Cloud in which the Kubernetes Cluster should be created.
-variable "google_project_id" {}
-
-# Name of the Kubernetes cluster to be created
-variable "k8s_cluster_name" {}
-
 provider "google" {
   # provider plugin version
   version = "~> 1.20"

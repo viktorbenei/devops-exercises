@@ -1,0 +1,34 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: micro-echo-svc
+  name: micro-echo-svc
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: micro-echo-svc
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: micro-echo-svc
+    spec:
+      containers:
+      - image: micro-echo:v1
+        imagePullPolicy: IfNotPresent
+        name: micro-echo-svc
+        ports:
+        - containerPort: 8182
+        env:
+        - name: PORT
+          value: "8182"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always

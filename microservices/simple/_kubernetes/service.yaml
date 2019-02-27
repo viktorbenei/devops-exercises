@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: micro-echo-svc
+  name: micro-echo-svc
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8182
+  selector:
+    run: micro-echo-svc
+  sessionAffinity: None
+  type: ClusterIP

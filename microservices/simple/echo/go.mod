@@ -5,4 +5,5 @@ require (
 	github.com/gorilla/mux v1.7.0
 	github.com/justinas/alice v0.0.0-20171023064455-03f45bd4b7da
 	github.com/pkg/errors v0.8.1
+	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
 )

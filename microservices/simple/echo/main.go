@@ -28,16 +28,27 @@ func handleRoot(w http.ResponseWriter, r *http.Request) error {
 	}))
 }
 
-func main() {
+func mainE() error {
+	// Init
+	if err := initAuth(); err != nil {
+		return errors.WithStack(err)
+	}
+
 	// Setup routing
 	r := mux.NewRouter().StrictSlash(true)
 	middlewareProvider := NewMiddlewareProvider("MicEx", version)
+	// auth
+	r.Handle("/callback", httpresponse.InternalErrHandlerFuncAdapter(authCallbackHandler))
+	r.Handle("/login", httpresponse.InternalErrHandlerFuncAdapter(authLoginHandler))
+	//
 	r.Handle("/hi", middlewareProvider.CommonMiddleware().Then(
 		httpresponse.InternalErrHandlerFuncAdapter(sayHello))).Methods("GET")
 	r.Handle("/", middlewareProvider.CommonMiddleware().Then(
 		httpresponse.InternalErrHandlerFuncAdapter(handleRoot))).Methods("GET")
+	//
 	http.Handle("/", r)
 
+	// Start the server
 	if p := os.Getenv("PORT"); p != "" {
 		port = p
 	}
@@ -45,5 +56,12 @@ func main() {
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Printf("[!] Exception: %+v", err)
 		panic(err)
+	}
+	return nil
+}
+
+func main() {
+	if err := mainE(); err != nil {
+		log.Printf("[!] Exception: %+v", err)
 	}
 }

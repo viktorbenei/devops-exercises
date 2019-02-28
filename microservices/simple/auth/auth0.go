@@ -19,13 +19,13 @@ var (
 	sessionStore *sessions.FilesystemStore
 )
 
-func initAuth() error {
+func initAuth0() error {
 	sessionStore = sessions.NewFilesystemStore("", []byte("something-very-secret"))
 	gob.Register(map[string]interface{}{})
 	return nil
 }
 
-func authCallbackHandler(w http.ResponseWriter, r *http.Request) error {
+func auth0CallbackHandler(w http.ResponseWriter, r *http.Request) error {
 	domain := os.Getenv("AUTH0_DOMAIN")
 
 	conf := &oauth2.Config{
@@ -91,7 +91,7 @@ func authCallbackHandler(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func authLoginHandler(w http.ResponseWriter, r *http.Request) error {
+func auth0LoginHandler(w http.ResponseWriter, r *http.Request) error {
 	domain := os.Getenv("AUTH0_DOMAIN")
 	aud := os.Getenv("AUTH0_AUDIENCE")
 

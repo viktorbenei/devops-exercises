@@ -10,17 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-const appName = "echo.api"
+const appName = "auth.api"
 
 var port = "8182"
-
-func sayHello(w http.ResponseWriter, r *http.Request) error {
-	message := "Hello " + r.URL.Query().Get("name")
-
-	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
-		"message": message,
-	}))
-}
 
 func handleRoot(w http.ResponseWriter, r *http.Request) error {
 	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
@@ -31,12 +23,17 @@ func handleRoot(w http.ResponseWriter, r *http.Request) error {
 }
 
 func mainE() error {
+	// Init
+	if err := initAuth0(); err != nil {
+		return errors.WithStack(err)
+	}
+
 	// Setup routing
 	r := mux.NewRouter().StrictSlash(true)
 	middlewareProvider := NewMiddlewareProvider(appName, version)
-	//
-	r.Handle("/hi", middlewareProvider.CommonMiddleware().Then(
-		httpresponse.InternalErrHandlerFuncAdapter(sayHello))).Methods("GET")
+	// auth
+	r.Handle("/callback", httpresponse.InternalErrHandlerFuncAdapter(auth0CallbackHandler))
+	r.Handle("/login", httpresponse.InternalErrHandlerFuncAdapter(auth0LoginHandler))
 	r.Handle("/", middlewareProvider.CommonMiddleware().Then(
 		httpresponse.InternalErrHandlerFuncAdapter(handleRoot))).Methods("GET")
 	//

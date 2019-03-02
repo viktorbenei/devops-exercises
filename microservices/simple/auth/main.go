@@ -21,6 +21,11 @@ var port = "8182"
 var globalSessionStore sessions.Store
 var globalJWTHMACSecret []byte
 
+type MyCustomClaims struct {
+	Foo string `json:"foo"`
+	jwt.StandardClaims
+}
+
 func handleGenUserJWT(w http.ResponseWriter, r *http.Request) error {
 	session, err := globalSessionStore.Get(r, "auth-session")
 	if err != nil {
@@ -45,11 +50,14 @@ func handleGenUserJWT(w http.ResponseWriter, r *http.Request) error {
 	if !ok {
 		return errors.New("Failed to cast 'sub' to required type")
 	}
-	claims := jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
-		IssuedAt:  time.Now().Unix(),
-		Issuer:    appName,
-		Subject:   sub,
+	claims := MyCustomClaims{
+		"bar",
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(1 * time.Minute).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    appName,
+			Subject:   sub,
+		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

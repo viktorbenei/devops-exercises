@@ -15,9 +15,15 @@ const appName = "private.notes"
 
 var port = "8182"
 var datastore *Datastore
+var tokenValidator *TokenValidator
 
 func handleGetNotes(w http.ResponseWriter, r *http.Request) error {
-	userID := r.Header.Get("UserID")
+	// TODO: use a common middleware for token validation
+	claims, err := tokenValidator.Validate(r)
+	if err != nil {
+		return httpresponse.RespondWithError(w, err.Error(), http.StatusUnauthorized)
+	}
+	userID := claims.Subject
 
 	userNotes, err := datastore.GetNotes(UserID(userID))
 	if err != nil {
@@ -30,7 +36,13 @@ func handleGetNotes(w http.ResponseWriter, r *http.Request) error {
 }
 
 func handleCreateNote(w http.ResponseWriter, r *http.Request) error {
-	userID := r.Header.Get("UserID")
+	// TODO: use a common middleware for token validation
+	claims, err := tokenValidator.Validate(r)
+	if err != nil {
+		return httpresponse.RespondWithError(w, err.Error(), http.StatusUnauthorized)
+	}
+	userID := claims.Subject
+
 	noteID := r.Header.Get("NoteID")
 
 	note := Note{}
@@ -75,6 +87,14 @@ func handlerErrorHandlingAdapter(h httpresponse.HanderFuncWithInternalError) htt
 func mainE() error {
 	// Init
 	datastore = NewDatastore()
+	//
+	{
+		tv, err := NewTokenValidator([]byte(os.Getenv("JWT_HMAC_SECRET")))
+		if err != nil {
+			return errors.Wrap(err, "Failed to create token validator")
+		}
+		tokenValidator = tv
+	}
 
 	// Setup routing
 	r := mux.NewRouter().StrictSlash(true)

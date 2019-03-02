@@ -5,9 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 )
+
+type MyCustomClaims struct {
+	Foo string `json:"foo"`
+	jwt.StandardClaims
+}
 
 type TokenValidator struct {
 	hmacSecret []byte
@@ -24,17 +29,17 @@ func NewTokenValidator(hmacSecret []byte) (*TokenValidator, error) {
 }
 
 // Validate ...
-func (t *TokenValidator) Validate(r *http.Request) error {
+func (t *TokenValidator) Validate(r *http.Request) (*MyCustomClaims, error) {
 	authHeader := r.Header.Get("Authorization")
 	if !strings.HasPrefix(authHeader, "Bearer ") {
-		return errors.New("Only Bearer Authorization accepted")
+		return nil, errors.New("Only Bearer Authorization accepted")
 	}
 	jwtToken := strings.TrimPrefix(authHeader, "Bearer ")
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
 	// to the callback, providing flexibility.
-	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(jwtToken, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -44,14 +49,12 @@ func (t *TokenValidator) Validate(r *http.Request) error {
 		return t.hmacSecret, nil
 	})
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims["foo"], claims["nbf"])
-	} else {
-		fmt.Println(err)
+	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
+		return claims, nil
 	}
 
-	return nil
+	return nil, errors.New("Invalid Claims")
 }

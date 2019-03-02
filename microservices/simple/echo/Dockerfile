@@ -11,7 +11,7 @@ ADD . /src
 #  otherwhise the vendor/ dir is ignored in 1.11 module mode.
 #  For more info see: https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away
 RUN cd /src \
-    && go vet -v ./... \
+    # && go vet -v ./... \
     # && go get -u github.com/kisielk/errcheck && errcheck -asserts=true -blank=true -verbose ./... \
     # && go build -mod=vendor -o /go/bin/server ./server
     && go build -o /go/bin/server .

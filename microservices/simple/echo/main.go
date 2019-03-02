@@ -13,13 +13,8 @@ import (
 const appName = "private.echo"
 
 var port = "8182"
-var tokenValidator *TokenValidator
 
 func sayHello(w http.ResponseWriter, r *http.Request) error {
-	if err := tokenValidator.Validate(r); err != nil {
-		return httpresponse.RespondWithError(w, err.Error(), http.StatusUnauthorized)
-	}
-
 	message := "Hello " + r.URL.Query().Get("name")
 
 	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
@@ -36,11 +31,6 @@ func handleRoot(w http.ResponseWriter, r *http.Request) error {
 }
 
 func mainE() error {
-	tv, err := NewTokenValidator([]byte(os.Getenv("JWT_HMAC_SECRET")))
-	if err != nil {
-		return errors.Wrap(err, "Failed to create token validator")
-	}
-	tokenValidator = tv
 
 	// Setup routing
 	r := mux.NewRouter().StrictSlash(true)

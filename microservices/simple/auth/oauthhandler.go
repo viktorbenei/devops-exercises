@@ -4,13 +4,11 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/gob"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/bitrise-io/api-utils/httpresponse"
 	"github.com/gorilla/sessions"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -39,12 +37,7 @@ func requiredEnv(envKey string) (string, error) {
 }
 
 // NewOAuthHandler ...
-func NewOAuthHandler() (*OAuthHandler, error) {
-	sessionKey, err := requiredEnv("SESSION_KEY")
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
+func NewOAuthHandler(sessionStore sessions.Store) (*OAuthHandler, error) {
 	domain, err := requiredEnv("OAUTH_DOMAIN")
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -67,10 +60,6 @@ func NewOAuthHandler() (*OAuthHandler, error) {
 		audience = "https://" + domain + "/userinfo"
 		log.Printf(" (!) OAUTH_AUDIENCE was not provided, using the domain instead: %s", audience)
 	}
-
-	// TODO: either remove the session store or handle it properly.
-	sessionStore := sessions.NewCookieStore([]byte(sessionKey))
-	gob.Register(map[string]interface{}{})
 
 	return &OAuthHandler{
 		domain:       domain,
@@ -143,18 +132,8 @@ func (ah *OAuthHandler) OAuthCallbackHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Redirect to logged in page
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
-	log.Printf("=> token: %#v", token)
-	log.Printf("=> id_token: %#v", session.Values["id_token"])
-	log.Printf("=> access_token: %#v", session.Values["access_token"])
-	log.Printf("=> session: %#v", session)
-	log.Printf("=> profile: %#v", profile)
-
-	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]interface{}{
-		"id_token":     session.Values["id_token"],
-		"access_token": session.Values["access_token"],
-		"profile":      session.Values["profile"],
-	}))
+	http.Redirect(w, r, "/token/user", http.StatusSeeOther)
+	return nil
 }
 
 // OAuthLoginHandler ...

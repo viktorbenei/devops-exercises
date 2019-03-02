@@ -11,6 +11,7 @@ services:
       PORT: "8190"
       #
       SESSION_KEY:
+      JWT_HMAC_SECRET:
       #
       OAUTH_DOMAIN:
       OAUTH_CLIENT_ID:
@@ -26,3 +27,4 @@ services:
      - "8191:8191"
     environment:
       PORT: "8191"
+      JWT_HMAC_SECRET:

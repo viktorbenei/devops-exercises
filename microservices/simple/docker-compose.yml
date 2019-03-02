@@ -1,0 +1,19 @@
+version: '2'
+services:
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    mem_limit: 1024m
+    ports:
+     - "8190:8190"
+    environment:
+      PORT: "8190"
+      #
+      SESSION_KEY:
+      #
+      AUTH0_DOMAIN:
+      AUTH0_CLIENT_ID:
+      AUTH0_CLIENT_SECRET:
+      AUTH0_CALLBACK_URL:
+      AUTH0_AUDIENCE:

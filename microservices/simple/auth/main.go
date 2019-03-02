@@ -24,7 +24,8 @@ func handleRoot(w http.ResponseWriter, r *http.Request) error {
 
 func mainE() error {
 	// Init
-	if err := initAuth0(); err != nil {
+	authHandler, err := NewAuth0Handler()
+	if err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -32,8 +33,8 @@ func mainE() error {
 	r := mux.NewRouter().StrictSlash(true)
 	middlewareProvider := NewMiddlewareProvider(appName, version)
 	// auth
-	r.Handle("/callback", httpresponse.InternalErrHandlerFuncAdapter(auth0CallbackHandler))
-	r.Handle("/login", httpresponse.InternalErrHandlerFuncAdapter(auth0LoginHandler))
+	r.Handle("/callback", httpresponse.InternalErrHandlerFuncAdapter(authHandler.Auth0CallbackHandler))
+	r.Handle("/login", httpresponse.InternalErrHandlerFuncAdapter(authHandler.Auth0LoginHandler))
 	r.Handle("/", middlewareProvider.CommonMiddleware().Then(
 		httpresponse.InternalErrHandlerFuncAdapter(handleRoot))).Methods("GET")
 	//

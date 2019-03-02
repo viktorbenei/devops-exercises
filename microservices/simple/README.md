@@ -10,6 +10,13 @@
 
 ## Demo
 
+Start the servers with docker-compose:
+
+```
+source .env
+docker-compose up --build
+```
+
 First you have to authenticate yourself. You can do this by calling the `auth` api:
 
 ```

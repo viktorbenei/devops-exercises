@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,8 +16,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Auth0Handler ...
-type Auth0Handler struct {
+// OAuthHandler ...
+type OAuthHandler struct {
 	domain       string
 	clientID     string
 	clientSecret string
@@ -39,41 +38,41 @@ func requiredEnv(envKey string) (string, error) {
 	return val, nil
 }
 
-// NewAuth0Handler ...
-func NewAuth0Handler() (*Auth0Handler, error) {
+// NewOAuthHandler ...
+func NewOAuthHandler() (*OAuthHandler, error) {
 	sessionKey, err := requiredEnv("SESSION_KEY")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	domain, err := requiredEnv("AUTH0_DOMAIN")
+	domain, err := requiredEnv("OAUTH_DOMAIN")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	clientID, err := requiredEnv("AUTH0_CLIENT_ID")
+	clientID, err := requiredEnv("OAUTH_CLIENT_ID")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	clientSecret, err := requiredEnv("AUTH0_CLIENT_SECRET")
+	clientSecret, err := requiredEnv("OAUTH_CLIENT_SECRET")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	callbackURL, err := requiredEnv("AUTH0_CALLBACK_URL")
+	callbackURL, err := requiredEnv("OAUTH_CALLBACK_URL")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	audience := os.Getenv("AUTH0_AUDIENCE")
+	audience := os.Getenv("OAUTH_AUDIENCE")
 	if len(audience) < 1 {
 		audience = "https://" + domain + "/userinfo"
-		log.Printf(" (!) AUTH0_AUDIENCE was not provided, using the domain instead: %s", audience)
+		log.Printf(" (!) OAUTH_AUDIENCE was not provided, using the domain instead: %s", audience)
 	}
 
 	// TODO: either remove the session store or handle it properly.
 	sessionStore := sessions.NewCookieStore([]byte(sessionKey))
 	gob.Register(map[string]interface{}{})
 
-	return &Auth0Handler{
+	return &OAuthHandler{
 		domain:       domain,
 		clientID:     clientID,
 		clientSecret: clientSecret,
@@ -85,8 +84,8 @@ func NewAuth0Handler() (*Auth0Handler, error) {
 	}, nil
 }
 
-// Auth0CallbackHandler ...
-func (ah *Auth0Handler) Auth0CallbackHandler(w http.ResponseWriter, r *http.Request) error {
+// OAuthCallbackHandler ...
+func (ah *OAuthHandler) OAuthCallbackHandler(w http.ResponseWriter, r *http.Request) error {
 	conf := &oauth2.Config{
 		ClientID:     ah.clientID,
 		ClientSecret: ah.clientSecret,
@@ -149,15 +148,17 @@ func (ah *Auth0Handler) Auth0CallbackHandler(w http.ResponseWriter, r *http.Requ
 	log.Printf("=> id_token: %#v", session.Values["id_token"])
 	log.Printf("=> access_token: %#v", session.Values["access_token"])
 	log.Printf("=> session: %#v", session)
+	log.Printf("=> profile: %#v", profile)
 
-	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]string{
-		"id_token":     fmt.Sprintf("%s", session.Values["id_token"]),
-		"access_token": fmt.Sprintf("%s", session.Values["access_token"]),
+	return errors.WithStack(httpresponse.RespondWithSuccess(w, map[string]interface{}{
+		"id_token":     session.Values["id_token"],
+		"access_token": session.Values["access_token"],
+		"profile":      session.Values["profile"],
 	}))
 }
 
-// Auth0LoginHandler ...
-func (ah *Auth0Handler) Auth0LoginHandler(w http.ResponseWriter, r *http.Request) error {
+// OAuthLoginHandler ...
+func (ah *OAuthHandler) OAuthLoginHandler(w http.ResponseWriter, r *http.Request) error {
 	aud := ah.audience
 
 	conf := &oauth2.Config{

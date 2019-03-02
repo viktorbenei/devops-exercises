@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const appName = "auth.api"
+const appName = "public.auth"
 
 var port = "8182"
 

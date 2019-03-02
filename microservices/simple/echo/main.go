@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const appName = "echo.api"
+const appName = "private.echo"
 
 var port = "8182"
 var tokenValidator *TokenValidator

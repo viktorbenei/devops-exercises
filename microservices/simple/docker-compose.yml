@@ -4,7 +4,7 @@ services:
     build:
       context: ./auth
       dockerfile: Dockerfile
-    mem_limit: 1024m
+    mem_limit: 512m
     ports:
      - "8190:8190"
     environment:
@@ -17,3 +17,12 @@ services:
       OAUTH_CLIENT_SECRET:
       OAUTH_CALLBACK_URL:
       OAUTH_AUDIENCE:
+  notes:
+    build:
+      context: ./notes
+      dockerfile: Dockerfile
+    mem_limit: 512m
+    ports:
+     - "8191:8191"
+    environment:
+      PORT: "8191"

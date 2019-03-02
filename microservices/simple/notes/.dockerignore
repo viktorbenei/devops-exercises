@@ -1,0 +1,15 @@
+#
+# When changing sync with .gitignore!
+#
+
+
+# bitrise cli
+.bitrise.secrets.yml
+# Terraform
+*.tfstate
+*.tfstate.*
+**/.terraform/*
+# secret envs
+.env
+# build intermediate dirs
+_bin/

@@ -1,6 +1,6 @@
-# devops-exercises
+# devops-playground
 
-DevOps Exercises.
+DevOps Playground.
 
 ## Important notes
 

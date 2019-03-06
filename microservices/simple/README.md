@@ -2,6 +2,10 @@
 
 - Includes authentication and authorization as a microservice
 
+## TODO:
+
+- Auth should be based on OpenID Connect.
+
 ## Layout/services
 
 - `auth`: Authentication and authorization.
